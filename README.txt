@@ -2,7 +2,7 @@ Windows 11
 cmd:
 pip install pyinstaller==5.13.2
 
-c:\Tools\lowercase_util>pyinstaller --onefile --noconsole lowercase_util.py
+c:\Tools\zid-name>pyinstaller --onefile --noconsole zid_name.py
 
 [[20240327160032 pyinstaller err|20240327160032-pyinstaller-err]]
 
