@@ -8,7 +8,7 @@ def get_clipboard_text():
 def set_clipboard_text(text):
     pyperclip.copy(text)
 
-def replace_german_chars(input_string):
+def replace_chars(input_string):
     # Replacement for German special characters
     replacements = {
         'ä': 'ae', 'ö': 'oe', 'ü': 'ue', 'ß': 'ss', 'ẞ': 'ss',
@@ -20,7 +20,7 @@ def replace_german_chars(input_string):
 
 def process_string(input_string):
     # Apply replacements for German characters
-    input_string = replace_german_chars(input_string)
+    input_string = replace_chars(input_string)
     
     # Allow hyphens to remain and remove other unwanted characters
     cleaned_string = re.sub(r'[^a-zA-Zа-яА-ЯёЁ0-9\s-]', '', input_string)
