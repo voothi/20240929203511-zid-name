@@ -12,7 +12,7 @@ def replace_chars(input_string):
     # Replacement for German special characters
     replacements = {
         'ä': 'ae', 'ö': 'oe', 'ü': 'ue', 'ß': 'ss', 'ẞ': 'ss',
-        'Ä': 'ae', 'Ö': 'oe', 'Ü': 'ue', '_': '-'
+        'Ä': 'ae', 'Ö': 'oe', 'Ü': 'ue', '_': '-', ':': '-'
     }
     for char, replacement in replacements.items():
         input_string = input_string.replace(char, replacement)
