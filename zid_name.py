@@ -31,6 +31,9 @@ def process_string(input_string):
     # Replace spaces with "-"
     processed_string = re.sub(r'\s+', '-', cleaned_string)
     
+    # Strip leading/trailing spaces and hyphens
+    processed_string = processed_string.strip('-').strip()
+    
     return processed_string
 
 def main():
