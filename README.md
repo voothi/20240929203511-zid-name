@@ -11,6 +11,7 @@ A lightweight utility for generating clean, lowercased, and hyphen-separated slu
 - [Installation](#installation)
     - [From Source](#from-source)
     - [Standalone Executable](#standalone-executable)
+- [Configuration](#configuration)
 - [Usage](#usage)
 - [AutoHotkey Integration](#autohotkey-integration)
 - [Kardenwort](#kardenwort)
@@ -48,6 +49,38 @@ A lightweight utility for generating clean, lowercased, and hyphen-separated slu
 
 ### Standalone Executable
 You can find pre-built executables in the `dist/` folder or under the Releases section.
+
+[Return to Top](#zid-name-utility)
+
+## Configuration
+You can customize the script's behavior by modifying the `config.ini` file in the application directory.
+
+```ini
+[Settings]
+word_limit = 6
+allowed_chars_regex = [^a-zA-Zа-яА-ЯёЁ0-9\s-]
+
+[Format]
+lowercase = true
+separator = -
+
+[Replacements]
+ä = ae
+ö = oe
+ü = ue
+ß = ss
+```
+
+### Settings
+- **word_limit**: The maximum number of words to include in the generated slug (default: 6).
+- **allowed_chars_regex**: A regular expression defining which characters are kept before splitting into words.
+
+### Format
+- **lowercase**: If `true`, the final output will be converted to lowercase.
+- **separator**: The character used to join words (e.g., `-` or `_`).
+
+### Replacements
+A list of specific character-to-string mappings. This is useful for handling umlauts or specific punctuation.
 
 [Return to Top](#zid-name-utility)
 
