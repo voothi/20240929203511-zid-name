@@ -14,9 +14,9 @@ class TestZidName(unittest.TestCase):
     """
 
     def test_umlauts_and_eszett(self):
-        # Häuser, Schlösser, Füße -> haeuser-schloesser-fuesse
+        # Häuser, Schlösser, Füße und Fußball -> haeuser-schloesser-fuesse-und
         input_str = "Häuser, Schlösser, Füße und Fußball sind schön"
-        expected = "haeuser-schloesser-fuesse"
+        expected = "haeuser-schloesser-fuesse-und"
         self.assertEqual(process_string(input_str), expected)
 
     def test_capital_umlauts(self):
@@ -32,15 +32,15 @@ class TestZidName(unittest.TestCase):
         self.assertEqual(process_string(input_str), expected)
 
     def test_zid_with_prefix(self):
-        # + 20260104223641 Übung macht den Meister -> + 20260104223641-uebung-macht-den
+        # + 20260104223641 Übung macht den Meister -> + 20260104223641-uebung-macht-den-meister
         input_str = "+ 20260104223641 Übung macht den Meister"
-        expected = "+ 20260104223641-uebung-macht-den"
+        expected = "+ 20260104223641-uebung-macht-den-meister"
         self.assertEqual(process_string(input_str), expected)
 
     def test_zid_no_prefix(self):
-        # 20260104222054 Große Straße in Berlin -> 20260104222054-grosse-strasse-in
+        # 20260104222054 Große Straße in Berlin -> 20260104222054-grosse-strasse-in-berlin
         input_str = "20260104222054 Große Straße in Berlin"
-        expected = "20260104222054-grosse-strasse-in"
+        expected = "20260104222054-grosse-strasse-in-berlin"
         self.assertEqual(process_string(input_str), expected)
 
 if __name__ == '__main__':

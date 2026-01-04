@@ -60,7 +60,7 @@ You can customize the script's behavior by modifying the `config.ini` file in th
 
 ```ini
 [Settings]
-slug_word_count = 6
+slug_word_count = 4
 allowed_chars_regex = [^a-zA-Zа-яА-ЯёЁ0-9\s-]
 
 [Format]
@@ -75,7 +75,7 @@ separator = -
 ```
 
 ### Settings
-- **slug_word_count**: The maximum number of words to include in the generated slug (default: 6). This count excludes the 14-digit ZID if present at the start of the input.
+- **slug_word_count**: The maximum number of words to include in the generated slug (default: 4). This count excludes the 14-digit ZID if present at the start of the input.
 - **allowed_chars_regex**: A regular expression defining which characters are kept before splitting into words.
 
 ### Format
@@ -125,7 +125,7 @@ To run the tests:
 ```bash
 python tests/test_zid_name.py
 ```
-*Note: The tests rely on the current settings in `config.ini`. Ensure `slug_word_count` is set to 3 for the default test cases to pass.*
+*Note: The tests rely on the current settings in `config.ini`. Ensure `slug_word_count` is set to 4 for the default test cases to pass.*
 
 [Return to Top](#zid-name-utility)
 
