@@ -9,6 +9,8 @@ A lightweight utility for generating clean, lowercased, and hyphen-separated slu
 - [Description](#description)
 - [Features](#features)
 - [Installation](#installation)
+    - [From Source](#from-source)
+    - [Standalone Executable](#standalone-executable)
 - [Usage](#usage)
 - [AutoHotkey Integration](#autohotkey-integration)
 - [Kardenwort](#kardenwort)
