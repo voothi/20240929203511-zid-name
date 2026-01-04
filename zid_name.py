@@ -9,7 +9,7 @@ def set_clipboard_text(text):
     pyperclip.copy(text)
 
 def replace_chars(input_string):
-    # Замена специальных символов
+    # Replace special characters
     replacements = {
         'ä': 'ae', 'ö': 'oe', 'ü': 'ue', 'ß': 'ss', 'ẞ': 'ss',
         'Ä': 'ae', 'Ö': 'oe', 'Ü': 'ue', '_': '-', ':': '-', '. ': '-', '.': '-'
@@ -20,8 +20,8 @@ def replace_chars(input_string):
 
 def process_string(input_string):
     """
-    Обрабатывает строку: оставляет только первые 6 слов,
-    соединяет их дефисами и приводит к нижнему регистру.
+    Processes a string: keeps only the first 6 words,
+    joins them with hyphens, and converts to lowercase.
     """
     processed_string = replace_chars(input_string)
 
