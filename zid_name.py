@@ -11,7 +11,7 @@ def get_config():
     config_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'config.ini')
     
     defaults = {
-        'word_limit': 6,
+        'slug_word_count': 6,
         'allowed_chars_regex': r'[^a-zA-Zа-яА-ЯёЁ0-9\s-]',
         'lowercase': True,
         'separator': '-',
@@ -28,7 +28,7 @@ def get_config():
         config.read(config_path)
         
         settings = {
-            'word_limit': config.getint('Settings', 'word_limit', fallback=defaults['word_limit']),
+            'slug_word_count': config.getint('Settings', 'slug_word_count', fallback=defaults['slug_word_count']),
             'allowed_chars_regex': config.get('Settings', 'allowed_chars_regex', fallback=defaults['allowed_chars_regex']),
             'lowercase': config.getboolean('Format', 'lowercase', fallback=defaults['lowercase']),
             'separator': config.get('Format', 'separator', fallback=defaults['separator']),
@@ -41,12 +41,8 @@ def get_config():
         else:
             settings['replacements'] = defaults['replacements']
             
-        # Debug print
-        # print(f"DEBUG: Config Path: {config_path}")
-        # print(f"DEBUG: Loaded Settings: {settings}")
         return settings
-    except (configparser.Error, ValueError) as e:
-        # print(f"DEBUG: Error reading config: {e}")
+    except (configparser.Error, ValueError):
         return defaults
 
 def get_clipboard_text():
@@ -55,39 +51,55 @@ def get_clipboard_text():
 def set_clipboard_text(text):
     pyperclip.copy(text)
 
-def replace_chars(input_string, replacements):
-    # Replace special characters from config
-    for char, replacement in replacements.items():
-        input_string = input_string.replace(char, replacement)
-    return input_string
-
-def process_string(input_string):
+def sanitizeName(inputString, cfg):
     """
-    Processes a string using settings from config.ini.
+    Sanitizes a string: keeps only the first N words (from config),
+    joins them with separator, and converts to lowercase.
+    This function corresponds to sanitizeName in Obsidian templates.
     """
-    cfg = get_config()
-    
     # 1. Character replacements
-    processed_string = replace_chars(input_string, cfg['replacements'])
+    processedString = inputString
+    for char, replacement in cfg['replacements'].items():
+        processedString = processedString.replace(char, replacement)
 
     # 2. Regex filtering
-    cleaned_for_splitting = re.sub(cfg['allowed_chars_regex'], '', processed_string)
+    cleanedForSplitting = re.sub(cfg['allowed_chars_regex'], '', processedString)
 
     # 3. Splitting and limiting
-    words = cleaned_for_splitting.split()
-    first_words = words[:cfg['word_limit']]
+    words = cleanedForSplitting.split()
+    firstWords = words[:cfg['slug_word_count']]
 
     # 4. Joining with separator
-    final_name = cfg['separator'].join(first_words)
+    finalName = cfg['separator'].join(firstWords)
 
     # 5. Case conversion
     if cfg['lowercase']:
-        final_name = final_name.lower()
+        finalName = finalName.lower()
 
-    return final_name
+    return finalName
+
+def process_string(input_string):
+    """
+    Main processing logic: Detects ZID and handles word limit accordingly.
+    """
+    cfg = get_config()
+    
+    # Regex to detect ZID at the start (matching Obsidian template zidLineRegex)
+    # /^(\s*(?:(?:[-*+]|\d+\.)(?:\s+\[[ xX]\])?\s+)?)(\d{14})\s+(.*)$/
+    zidLineRegex = r'^(\s*(?:(?:[-*+]|\d+\.)(?:\s+\[[ xX]\])?\s+)?)(\d{14})\s+(.*)$'
+    zid_match = re.match(zidLineRegex, input_string)
+    
+    if zid_match:
+        prefix = zid_match.group(1) or ""
+        zid = zid_match.group(2)
+        raw_text = zid_match.group(3)
+        safe_name = sanitizeName(raw_text, cfg)
+        return f"{prefix}{zid}{cfg['separator']}{safe_name}"
+    else:
+        return sanitizeName(input_string, cfg)
 
 def main():
-    parser = argparse.ArgumentParser(description="Process string for a filename based on config.ini settings.")
+    parser = argparse.ArgumentParser(description="Process string for a filename based on config.ini settings (ZID aware).")
     parser.add_argument("input_string", nargs='?', type=str, help="Input string to process. If not provided, clipboard content will be used.")
     args = parser.parse_args()
     

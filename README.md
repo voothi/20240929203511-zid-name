@@ -57,7 +57,7 @@ You can customize the script's behavior by modifying the `config.ini` file in th
 
 ```ini
 [Settings]
-word_limit = 6
+slug_word_count = 6
 allowed_chars_regex = [^a-zA-Zа-яА-ЯёЁ0-9\s-]
 
 [Format]
@@ -72,7 +72,7 @@ separator = -
 ```
 
 ### Settings
-- **word_limit**: The maximum number of words to include in the generated slug (default: 6).
+- **slug_word_count**: The maximum number of words to include in the generated slug (default: 6). This count excludes the 14-digit ZID if present at the start of the input.
 - **allowed_chars_regex**: A regular expression defining which characters are kept before splitting into words.
 
 ### Format
