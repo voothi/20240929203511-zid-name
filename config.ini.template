@@ -1,0 +1,20 @@
+[Settings]
+slug_word_count = 4
+allowed_chars_regex = [^a-zA-Zа-яА-ЯёЁ0-9\s-]
+
+[Format]
+lowercase = true
+separator = -
+
+[Replacements]
+ä = ae
+ö = oe
+ü = ue
+ß = ss
+ẞ = ss
+Ä = ae
+Ö = oe
+Ü = ue
+_ = -
+: = -
+. = -
