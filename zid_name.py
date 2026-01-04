@@ -6,7 +6,8 @@ import os
 
 def get_config():
     """Reads all settings from config.ini."""
-    config = configparser.ConfigParser()
+    config = configparser.ConfigParser(delimiters=('=',))
+    config.optionxform = str  # Preserve case for keys
     config_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'config.ini')
     
     defaults = {
@@ -40,8 +41,12 @@ def get_config():
         else:
             settings['replacements'] = defaults['replacements']
             
+        # Debug print
+        # print(f"DEBUG: Config Path: {config_path}")
+        # print(f"DEBUG: Loaded Settings: {settings}")
         return settings
-    except (configparser.Error, ValueError):
+    except (configparser.Error, ValueError) as e:
+        # print(f"DEBUG: Error reading config: {e}")
         return defaults
 
 def get_clipboard_text():
