@@ -21,7 +21,7 @@ A lightweight utility for generating clean, lowercased, and hyphen-separated slu
 ---
 
 ## Description
-`zid-name` is a focused tool that processes an input string or the current clipboard content. It extracts the first 6 words, replaces special characters (including German umlauts), and joins them with hyphens in lowercase. This ensures consistent and cross-platform friendly filenames and note titles.
+`zid-name` is a focused tool that processes an input string or the current clipboard content. It extracts the first 4 words, replaces special characters (including German umlauts), and joins them with hyphens in lowercase. This ensures consistent and cross-platform friendly filenames and note titles.
 
 [Return to Top](#zid-name-utility)
 
@@ -29,7 +29,7 @@ A lightweight utility for generating clean, lowercased, and hyphen-separated slu
 - **Smart Slug Generation**: Converts titles into clean filenames (e.g., `My Note Title` → `my-note-title`).
 - **ZID-Awareness**: Automatically detects 14-digit timestamps (ZIDs) at the start of the input and excludes them from the word count.
 - **External Configuration**: Customize the word limit, character replacements, and formatting via `config.ini`.
-- **Word Limiting**: Automatically trims the result (excluding ZID) to the configured word count (default: 6).
+- **Word Limiting**: Automatically trims the result (excluding ZID) to the configured word count (default: 4).
 - **Umlaut Handling**: Replaces `ä`, `ö`, `ü`, and `ß` with `ae`, `oe`, `ue`, and `ss`.
 - **Character Normalization**: Replaces dots, underscores, and special punctuation with hyphens.
 - **Clipboard Integration**: Seamlessly reads from and writes back to the system clipboard.

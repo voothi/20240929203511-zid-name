@@ -11,7 +11,7 @@ def get_config():
     config_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'config.ini')
     
     defaults = {
-        'slug_word_count': 6,
+        'slug_word_count': 4,
         'allowed_chars_regex': r'[^a-zA-Zа-яА-ЯёЁ0-9\s-]',
         'lowercase': True,
         'separator': '-',
