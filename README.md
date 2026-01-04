@@ -14,6 +14,7 @@ A lightweight utility for generating clean, lowercased, and hyphen-separated slu
 - [Configuration](#configuration)
 - [Usage](#usage)
 - [AutoHotkey Integration](#autohotkey-integration)
+- [Development](#development)
 - [Kardenwort](#kardenwort)
 - [License](#license)
 
@@ -114,6 +115,19 @@ This script maps the process to `Ctrl + Alt + ;`, performing the following steps
 
 > [!IMPORTANT]
 > You must update the paths in the `RunWait` command within the `.ahk` script to match your local installation of Python and the location of `zid_name.py`.
+
+## Development
+
+### Verification Tests
+A Python test suite is available in the `tests/` directory to verify the logic for umlaut handling, ZID-awareness, and word counting.
+
+To run the tests:
+```bash
+python tests/test_zid_name.py
+```
+*Note: The tests rely on the current settings in `config.ini`. Ensure `slug_word_count` is set to 3 for the default test cases to pass.*
+
+[Return to Top](#zid-name-utility)
 
 ## Kardenwort Ecosystem
 
