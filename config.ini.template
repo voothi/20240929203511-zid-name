@@ -4,7 +4,7 @@ process_non_zid_lines = false
 # Preserves original extensions: e.g. 1 -> .pdf, 3 -> .1.de.srt. Takes priority over slugify.
 preserve_extension_depth = 0
 # Slugifies extensions: e.g. 1 -> -pdf, 3 -> -1-de-srt
-slugify_extension_depth = 0
+slugify_extension_depth = 3
 allowed_chars_regex = [^a-zA-Zа-яА-ЯёЁ0-9\s-]
 
 [Format]
