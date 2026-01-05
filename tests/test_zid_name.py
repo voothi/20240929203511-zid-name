@@ -109,10 +109,11 @@ Just some comment
             }
         }
         
-        # Test input with NO ZID
+        # Test input with NO ZID (Single Line)
         input_str = "Simple Title"
-        # Should return UNCHANGED because process_non_zid_lines is False
-        expected = "Simple Title"
+        # Smart logic: Single lines are always sanitized (legacy/substring support)
+        # even if process_non_zid_lines is False.
+        expected = "simple-title"
         self.assertEqual(process_string(input_str), expected)
         
         # Mixed content

@@ -83,7 +83,7 @@ def sanitizeName(inputString, cfg):
 
     return finalName
 
-def process_line(line, cfg):
+def process_line(line, cfg, force_sanitize=False):
     """
     Processes a single line: Detects ZID and handles word limit accordingly.
     """
@@ -102,8 +102,9 @@ def process_line(line, cfg):
         return f"{prefix}{zid}{cfg['separator']}{safe_name}"
     else:
         # Check config to see if we should process non-ZID lines
-        if cfg['process_non_zid_lines']:
-             # Only sanitize if not empty? 
+        # OR if we are forced to (single string selection case)
+        if force_sanitize or cfg['process_non_zid_lines']:
+             # Only sanitize if not empty
              if line.strip():
                 return sanitizeName(line, cfg)
              else:
@@ -116,8 +117,16 @@ def process_string(input_string):
     Main processing logic: Handles batch processing for multi-line strings.
     """
     cfg = get_config()
-    lines = input_string.splitlines()
     
+    # "Smart" Detection:
+    # If it's a single line (no newlines), we assume it's a specific selection 
+    # or a single title, so we ALWAYS sanitize it (legacy/substring support).
+    # If it's multi-line, we respect the process_non_zid_lines flag.
+    
+    if "\n" not in input_string and "\r" not in input_string:
+        return process_line(input_string, cfg, force_sanitize=True)
+    
+    lines = input_string.splitlines()
     processed_lines = []
     
     for line in lines:
