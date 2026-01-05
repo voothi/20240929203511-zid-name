@@ -92,6 +92,8 @@ def process_line(line, cfg, force_sanitize=False):
     # Group 2: ZID (14 digits)
     # Group 3: Remaining text
     zidLineRegex = r'^(\s*(?:(?:[-*+]|\d+\.)(?:\s+\[[ xX]\])?\s+)?)(\d{14})\s+(.*)$'
+    prefixOnlyRegex = r'^(\s*(?:(?:[-*+]|\d+\.)(?:\s+\[[ xX]\])?\s+))(.*)$'
+    
     zid_match = re.match(zidLineRegex, line)
     
     if zid_match:
@@ -103,8 +105,26 @@ def process_line(line, cfg, force_sanitize=False):
     else:
         # Check config to see if we should process non-ZID lines
         # OR if we are forced to (single string selection case)
-        if force_sanitize or cfg['process_non_zid_lines']:
-             # Only sanitize if not empty
+        if force_sanitize:
+             return sanitizeName(line, cfg) if line.strip() else line
+        
+        if cfg['process_non_zid_lines']:
+             # 1. Heading/Comment Preservation: Skip lines starting with '#'
+             if line.lstrip().startswith('#'):
+                 return line
+             
+             # 2. Smart List Prefix Preservation (even if no ZID)
+             # If a line looks like a task/list item, preserve the prefix.
+             prefix_match = re.match(prefixOnlyRegex, line)
+             if prefix_match:
+                 prefix = prefix_match.group(1)
+                 raw_text = prefix_match.group(2)
+                 if raw_text.strip():
+                     return f"{prefix}{sanitizeName(raw_text, cfg)}"
+                 else:
+                     return line
+             
+             # 3. Regular non-ZID, non-list, non-heading line
              if line.strip():
                 return sanitizeName(line, cfg)
              else:

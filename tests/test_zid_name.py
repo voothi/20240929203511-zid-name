@@ -138,17 +138,28 @@ Simple Title"""
             }
         }
         
-        # Test input with NO ZID
-        input_str = "Simple Title"
-        # Should be processed
-        expected = "simple-title"
-        self.assertEqual(process_string(input_str), expected)
-        
-        # Mixed content
+        # Test input with mixed content
         input_str = """20260105120000 Task One
-Simple Title"""
+# This is a heading
+Simple Title
+- [ ] Task without ZID
+  1. Numbered Task"""
+        
+        # Heading should be preserved UNCHANGED
+        # Task without ZID should preserve prefix
         expected = """20260105120000-task-one
-simple-title"""
+# This is a heading
+simple-title
+- [ ] task-without-zid
+  1. numbered-task"""
+        
+        self.assertEqual(process_string(input_str), expected)
+
+    def test_heading_preservation_single_line(self):
+        # Even if it's a heading, if it's a SINGLE line selection, 
+        # we still sanitize it (for filename creation from heading).
+        input_str = "# My Header"
+        expected = "my-header"
         self.assertEqual(process_string(input_str), expected)
 
 if __name__ == '__main__':
