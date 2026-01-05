@@ -30,6 +30,7 @@ A lightweight utility for generating clean, lowercased, and hyphen-separated slu
 - **Smart Sanitization**: Automatically detects whether to sanitize substrings (always) or multi-line blocks (based on config).
 - **ZID-Awareness**: Standardized regex identifies 14-digit timestamps (ZIDs) with prefixes (bullets, checkboxes, numbers, and headings) and excludes ZIDs from word counts.
 - **Markdown Heading Support**: Correctly handles `#` to `######` headers as structural prefixes.
+- **Sentence Boundary Handling**: Automatically converts `. ` to `-` to ensure clean slugs from multi-sentence titles.
 - **External Configuration**: Customize the word limit, character replacements, and formatting via `config.ini`.
 - **Word Limiting**: Automatically trims the result (excluding ZID) to the configured word count (default: 4).
 - **Umlaut Handling**: Replaces `ä`, `ö`, `ü`, and `ß` with `ae`, `oe`, `ue`, and `ss`.
@@ -74,6 +75,10 @@ separator = -
 ö = oe
 ü = ue
 ß = ss
+_ = -
+: = -
+.  = -
+. = -
 ```
 
 ### Settings

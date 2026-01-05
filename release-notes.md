@@ -7,6 +7,7 @@
 - **Feature**: **Smart Sanitization**. 
     - **Single-line** inputs are always sanitized to support manual substring or title-to-filename workflows.
     - **Multi-line** blocks respect the new `process_non_zid_lines` config flag to preserve technical structure while allowing ZID generation for headings.
+- **Improvement**: **Sentence Boundary Handling**. The script now converts `. ` (dot space) into a separator, ensuring multi-sentence inputs produce clean slugs without formatting artifacts.
 - **Improvement**: **List Marker Preservation**. Standardized regex now recognizes and preserves indentation, bullets, checkboxes (`- [ ]`, `- [x]`), and numbering.
 - **Improvement**: **Sanitization Refinement**. Added automatic stripping of trailing separators (e.g., `-`) from the generated slugs.
 - **Config**: Added `process_non_zid_lines` (default `false`) to control whether lines without ZIDs should be slugified in batch mode.
