@@ -70,6 +70,11 @@ Just some comment
         expected = "- [ ] 20260105120000-task-one"
         self.assertEqual(process_string(input_str), expected)
 
+    def test_sentence_boundary(self):
+        input_str = "Title. Description"
+        expected = "title-description"
+        self.assertEqual(process_string(input_str), expected)
+
     def test_no_wikilinks(self):
         # Explicit verify that we do NOT get [[...]]
         input_str = "20260105120000 Simple Task"
