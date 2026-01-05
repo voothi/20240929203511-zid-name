@@ -297,6 +297,74 @@ simple-title
         # collapse -> "Header-Subheader"
         self.assertEqual(process_string("Header - Subheader"), "header-subheader")
 
+    @patch('zid_name.get_config')
+    def test_add_extension_to_slug(self, mock_get_config):
+        # Case specific to user request:
+        # 20251114155621 IT Projektleiter _ Projektmanager (m_w_d) bei HENRICHSEN AG _ softgarden.pdf
+        # With slug_word_count=4, extension_nesting_level=0, BUT add_extension_to_slug=True.
+        # Expectation: 20251114155621-it-projektleiter-projektmanager-pdf
+        
+        base_config = {
+            'slug_word_count': 4,
+            'process_non_zid_lines': False,
+            'extension_nesting_level': 0, 
+            'add_extension_to_slug': True,
+            'allowed_chars_regex': r'[^a-zA-Zа-яА-ЯёЁ0-9\s-]',
+            'lowercase': True,
+            'separator': '-',
+            'replacements': {
+                 'ä': 'ae', 'ö': 'oe', 'ü': 'ue', 'ß': 'ss', 'ẞ': 'ss',
+                 'Ä': 'ae', 'Ö': 'oe', 'Ü': 'ue', '_': '-', ':': '-', '.': '-'
+            }
+        }
+        mock_get_config.return_value = base_config
+        
+        input_str = "20251114155621 IT Projektleiter _ Projektmanager (m_w_d) bei HENRICHSEN AG _ softgarden.pdf"
+        
+        # Stem: "IT Projektleiter _ Projektmanager (m_w_d) bei HENRICHSEN AG _ softgarden"
+        # Slugified Stem (first 4 words): "20251114155621-it-projektleiter-projektmanager" (ZID preserved in output prefix if present)
+        # Actually logic:
+        # ZID line regex separates ZID.
+        # Sanitized part uses string AFTER ZID.
+        # "IT Projektleiter ..." -> First 4 words: "IT", "Projektleiter", "Projektmanager", "mwd" (m_w_d -> m-w-d without parens if allowed regex is strict? Allowed has -).
+        # Wait, allowed_chars_regex: [^a-zA-Zа-яА-ЯёЁ0-9\s-]. ( and ) are gone.
+        # So " mw d " -> "mw d"?
+        # "m_w_d" -> "m-w-d" (replacements).
+        # "Projektmanager" -> "projektmanager"
+        # "softgarden" is way later.
+        
+        # But wait, user said expectation: "20251114155621-it-projektleiter-projektmanager" (if cut off).
+        # Let's verify what "IT Projektleiter _ Projektmanager (m_w_d)" becomes.
+        # "IT Projektleiter - Projektmanager m-w-d"
+        # Words: IT, Projektleiter, -, Projektmanager. (4 words). 
+        # Ah, separator is replaced first. `_` -> `-`.
+        # `( )` removed by regex.
+        # So it becomes "IT Projektleiter - Projektmanager m-w-d".
+        # If slug_word_count=4. 
+        # 1: IT
+        # 2: Projektleiter
+        # 3: - (If split includes it? split() usually splits on SPACE. If replacements made it "...leiter - Projekt...", then "-" is a word? 
+        # No, sanitizeName regex removal happens. Then split().
+        # If " - " exists, split() sees it as a token if space separated.
+        # But replacements mapped `_` -> `-`.
+        # User input has ` _ `. So ` - `.
+        # So yes, `-` is a word.
+        # `IT` `Projektleiter` `-` `Projektmanager`. That's 4.
+        # Output: `it-projektleiter-projektmanager`. (Wait, `-` joined with `-`? `it-projektleiter---projektmanager`. Then collapsed.)
+        
+        # Anyway, expected (from user): `20251114155621-it-projektleiter-projektmanager-pdf`
+        # This implies:
+        # Slug part: `it-projektleiter-projektmanager`
+        # Extension part: `-pdf`
+        
+        expected = "20251114155621-it-projektleiter-projektmanager-pdf"
+        self.assertEqual(process_string(input_str), expected)
+        
+        # Test 2: Simple file, not truncated, to ensure we don't duplicate extension or something.
+        # "File.png". Stem "File". Slug "file". Ext "png". Suffix "-png".
+        # Result: "file-png".
+        self.assertEqual(process_string("File.png"), "file-png")
+
 if __name__ == '__main__':
     print("Running zid_name logic tests...")
     unittest.main()

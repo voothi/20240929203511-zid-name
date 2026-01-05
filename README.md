@@ -85,9 +85,10 @@ _ = -
 ```
 
 ### Settings
-- **slug_word_count**: The maximum number of words to include in the generated slug (default: 4). This count excludes the 14-digit ZID if present at the start of the input.
+- **slug_word_count**: The maximum number of words to include in the generated slug (default: 4). This count excludes the 14-digit ZID and any preserved extensions (if configured).
 - **process_non_zid_lines**: If `true`, lines without ZIDs in a batch will still be slugified. If `false` (default), only ZID lines are processed, preserving comments and headings.
-- **extension_nesting_level**: Number of extension parts to preserve (default `0`). Set to `1` for `.png`, `2` for `.tar.gz`. Gracefully handles files with fewer extensions than configured.
+- **extension_nesting_level**: Number of extension parts to preserve as-is (e.g. `.pdf`). Set to `0` to treat extensions as part of the text (subject to word count cutting).
+- **add_extension_to_slug**: If `true` (and `extension_nesting_level = 0`), the detected file extension is preserved but slugified (e.g. `-pdf`) and appended *after* the word count limit. Useful for ensuring extensions appear in the name even if the title is long.
 - **allowed_chars_regex**: A regular expression defining which characters are kept before splitting into words.
 
 ### Format
