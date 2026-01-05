@@ -84,35 +84,31 @@ def sanitizeName(inputString, cfg):
         effective_level = min(slugify_depth, len(parts) - 1)
 
     if effective_level > 0:
-        potential_extensions = parts[-effective_level:]
+        # Iterative check: try to find the longest valid suffix of extensions
+        # starting from the requested depth down to 1.
+        found_extensions = []
+        found_stem = []
         
-        # Constraint: Extensions typically do not contain spaces and are not empty.
-        # If any potential extension part contains whitespace or is empty, we assume 
-        # this dot usage is NOT for a file extension (e.g. "Sentence end. Start new" or "Ending.").
-        # In that case, we abort extension handling and treat it as regular text.
-        is_valid_extension = all(ext and not re.search(r'\s', ext) for ext in potential_extensions)
-        
-        if is_valid_extension:
-            extensions = potential_extensions
-            stem = parts[:-effective_level]
+        for depth in range(effective_level, 0, -1):
+            potential_extensions = parts[-depth:]
             
+            # Constraint: Extensions typically do not contain spaces and are not empty.
+            if all(ext and not re.search(r'\s', ext) for ext in potential_extensions):
+                found_extensions = potential_extensions
+                found_stem = parts[:-depth]
+                break
+        
+        if found_extensions:
             # Reassemble stem so Step 1 can process it
-            inputString = ".".join(stem)
+            inputString = ".".join(found_stem)
             
             # Form the suffix
             if preserve_depth > 0:
                 # Standard extension preservation: .ext
-                extension_suffix = "." + ".".join(extensions)
+                extension_suffix = "." + ".".join(found_extensions)
             elif slugify_depth > 0:
                 # Slug mode: -ext
-                # We want it to join with the separator later, OR we can append it here.
-                # If we append it here as ".ext", step 1 replacements will likely turn '.' into '-'
-                # UNLESS replacements happen before re-attach? 
-                # Wait, return line is: return finalName + extension_suffix
-                # finalName is processed stem.
-                # If we want "-pdf", we should set extension_suffix to "-pdf".
-                # But we should respect the separator config.
-                extension_suffix = cfg['separator'] + cfg['separator'].join(extensions)
+                extension_suffix = cfg['separator'] + cfg['separator'].join(found_extensions)
                 if cfg['lowercase']:
                     extension_suffix = extension_suffix.lower()
 

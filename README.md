@@ -1,6 +1,6 @@
 # ZID Name Utility
 
-[![Version](https://img.shields.io/badge/version-v1.3.2-blue)](https://github.com/voothi/20240929203511-zid-name)
+[![Version](https://img.shields.io/badge/version-v1.3.3-blue)](https://github.com/voothi/20240929203511-zid-name)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 A lightweight utility for generating clean, lowercased, and hyphen-separated slugs from text. Specifically designed for creating Zettelkasten ID (ZID) note titles and filenames.

@@ -1,4 +1,10 @@
 
+## v1.3.3 (2026-01-05)
+**Robust Extension Handling**
+
+- **Fix**: **Iterative Extension Detection**. Fixed a bug where configuring a high extension depth (e.g., 3) would cause detection to fail entirely if an invalid separator was encountered. The script now intelligently falls back to the longest valid extension suffix (e.g., correctly finding `.ext1.ext2` even if `.invalid.ext1.ext2` was checked).
+- **Testing**: **Regression Prevention**. Added specific test cases to ensure complex filenames with "spaces and dots" are handled correctly without breaking valid extensions.
+
 ## v1.3.2 (2026-01-05)
 **Stabilization & Consistency**
 
