@@ -1,4 +1,13 @@
 
+## v1.2.4 (2026-01-05)
+**Extension Handling & Robustness**
+
+- **Feature**: **Extension Preservation**. Added `extension_nesting_level` setting to control how many file extensions are preserved (e.g., `.tar.gz` vs `.pdf`). Supports "up-to" logic, gracefully handling files with fewer extensions than configured.
+- **Improvement**: **Smart Extension Detection**. The script now intelligently distinguishes between file extensions and text punctuation. Dot-separated parts containing spaces (e.g., `End of sentence. Start of new`) are treated as text to be slugified, not as extensions.
+- **Improvement**: **Double Separator Cleanup**. Automatically collapses multiple separators (e.g., `--`) into one, ensuring clean slugs even when replacements generate extra hyphens.
+- **Fix**: **Configuration Stability**. Resolved a crash caused by duplicate keys in `config.ini` when trying to map `. ` to dashes.
+- **Config**: Added `extension_nesting_level` (default `0`) to `[Settings]`.
+
 ## v1.2.0 (2026-01-05)
 **Batch Processing & Smart Sanitization**
 

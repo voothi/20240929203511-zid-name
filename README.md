@@ -1,6 +1,6 @@
 # ZID Name Utility
 
-[![Version](https://img.shields.io/badge/version-v1.2.0-blue)](https://github.com/voothi/20240929203511-zid-name)
+[![Version](https://img.shields.io/badge/version-v1.2.4-blue)](https://github.com/voothi/20240929203511-zid-name)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 A lightweight utility for generating clean, lowercased, and hyphen-separated slugs from text. Specifically designed for creating Zettelkasten ID (ZID) note titles and filenames.
@@ -35,6 +35,8 @@ A lightweight utility for generating clean, lowercased, and hyphen-separated slu
 - **Word Limiting**: Automatically trims the result (excluding ZID) to the configured word count (default: 4).
 - **Umlaut Handling**: Replaces `ä`, `ö`, `ü`, and `ß` with `ae`, `oe`, `ue`, and `ss`.
 - **Character Normalization**: Replaces dots, underscores, and special punctuation with hyphens.
+- **Double Separator Cleanup**: Automatically collapses multiple separators (e.g., `--` -> `-`) for cleaner output.
+- **Extension Preservation**: Configurable extension handling (`extension_nesting_level`) to preserve file types like `.mp4` or `.tar.gz`.
 - **Clipboard Integration**: Seamlessly reads from and writes back to the system clipboard.
 
 [Return to Top](#zid-name-utility)
@@ -64,6 +66,7 @@ You can customize the script's behavior by modifying the `config.ini` file in th
 [Settings]
 slug_word_count = 4
 process_non_zid_lines = false
+extension_nesting_level = 0
 allowed_chars_regex = [^a-zA-Zа-яА-ЯёЁ0-9\s-]
 
 [Format]
@@ -84,6 +87,7 @@ _ = -
 ### Settings
 - **slug_word_count**: The maximum number of words to include in the generated slug (default: 4). This count excludes the 14-digit ZID if present at the start of the input.
 - **process_non_zid_lines**: If `true`, lines without ZIDs in a batch will still be slugified. If `false` (default), only ZID lines are processed, preserving comments and headings.
+- **extension_nesting_level**: Number of extension parts to preserve (default `0`). Set to `1` for `.png`, `2` for `.tar.gz`. Gracefully handles files with fewer extensions than configured.
 - **allowed_chars_regex**: A regular expression defining which characters are kept before splitting into words.
 
 ### Format
