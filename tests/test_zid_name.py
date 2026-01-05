@@ -43,6 +43,40 @@ class TestZidName(unittest.TestCase):
         expected = "20260104222054-grosse-strasse-in-berlin"
         self.assertEqual(process_string(input_str), expected)
 
+    def test_batch_processing(self):
+        # Multi-line input with mixed ZID and non-ZID lines
+        input_str = """- [ ] 20260105120000 Task One
+- [x] 20260105120001 Task Two
+Just some comment
+  * 20260105120002 Indented Task"""
+        
+        expected = """- [ ] 20260105120000-task-one
+- [x] 20260105120001-task-two
+Just some comment
+  * 20260105120002-indented-task"""
+        
+        self.assertEqual(process_string(input_str), expected)
+
+    def test_trailing_separator(self):
+        # Ensure trailing separators are removed 
+        # (e.g. "Task One - " should not become "task-one-")
+        input_str = "Task One - "
+        expected = "task-one"
+        self.assertEqual(process_string(input_str), expected)
+        
+        # With ZID
+        input_str = "- [ ] 20260105120000 Task One - "
+        expected = "- [ ] 20260105120000-task-one"
+        self.assertEqual(process_string(input_str), expected)
+
+    def test_no_wikilinks(self):
+        # Explicit verify that we do NOT get [[...]]
+        input_str = "20260105120000 Simple Task"
+        output = process_string(input_str)
+        self.assertNotIn("[[", output)
+        self.assertNotIn("]]", output)
+        self.assertEqual(output, "20260105120000-simple-task")
+
 if __name__ == '__main__':
     print("Running zid_name logic tests...")
     unittest.main()
