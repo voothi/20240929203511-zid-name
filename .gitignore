@@ -93,3 +93,5 @@ dist/
 
 __pycache__/
 __pycache__/zid_name.cpython-39.pyc
+
+ref/
