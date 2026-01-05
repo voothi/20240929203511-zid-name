@@ -61,8 +61,8 @@ Just some comment
         mock_get_config.return_value = {
             'slug_word_count': 4,
             'process_non_zid_lines': False,
-            'extension_nesting_level': 0,
-            'add_extension_to_slug': False,
+            'preserve_extension_depth': 0,
+            'slugify_extension_depth': 0,
             'allowed_chars_regex': r'[^a-zA-Zа-яА-ЯёЁ0-9\s-]',
             'lowercase': True,
             'separator': '-',
@@ -92,8 +92,8 @@ Simple Title"""
         mock_get_config.return_value = {
             'slug_word_count': 4,
             'process_non_zid_lines': True, # ENABLED
-            'extension_nesting_level': 0,
-            'add_extension_to_slug': False,
+            'preserve_extension_depth': 0,
+            'slugify_extension_depth': 0,
             'allowed_chars_regex': r'[^a-zA-Zа-яА-ЯёЁ0-9\s-]',
             'lowercase': True,
             'separator': '-',

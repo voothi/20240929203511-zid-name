@@ -1,4 +1,12 @@
 
+## v1.3.2 (2026-01-05)
+**Stabilization & Consistency**
+
+- **Refactor**: **Clean Codebase**. Removed accidental code duplication in the main utility script (`zid_name.py`).
+- **Improvement**: **Modern Configuration**. Finalized the transition to integer-based extension handling (`preserve_extension_depth`) in both configuration files and the test suite, retiring legacy boolean flags.
+- **Documentation**: **Enhanced Config Templates**. `config.ini.template` now includes clear comments explaining the priority and usage of extension handling features.
+- **Testing**: **Testing Reliability**. Updated all tests to correctly verify the new configuration logic, ensuring robust regression testing.
+
 ## v1.2.8 (2026-01-05)
 **Slug Extension Control & Test Refactoring**
 

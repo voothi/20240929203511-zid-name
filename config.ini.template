@@ -1,8 +1,10 @@
 [Settings]
 slug_word_count = 4
 process_non_zid_lines = false
-extension_nesting_level = 0
-add_extension_to_slug = true
+# Preserves original extensions: e.g. 1 -> .pdf, 3 -> .1.de.srt. Takes priority over slugify.
+preserve_extension_depth = 0
+# Slugifies extensions: e.g. 1 -> -pdf, 3 -> -1-de-srt
+slugify_extension_depth = 0
 allowed_chars_regex = [^a-zA-Zа-яА-ЯёЁ0-9\s-]
 
 [Format]

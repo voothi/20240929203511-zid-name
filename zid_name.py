@@ -13,7 +13,8 @@ def get_config():
     defaults = {
         'slug_word_count': 4,
         'process_non_zid_lines': False,
-        'extension_nesting_level': 0,
+        'preserve_extension_depth': 0,
+        'slugify_extension_depth': 0,
         'allowed_chars_regex': r'[^a-zA-Zа-яА-ЯёЁ0-9\s-]',
         'lowercase': True,
         'separator': '-',
@@ -32,8 +33,8 @@ def get_config():
         settings = {
             'slug_word_count': config.getint('Settings', 'slug_word_count', fallback=defaults['slug_word_count']),
             'process_non_zid_lines': config.getboolean('Settings', 'process_non_zid_lines', fallback=defaults['process_non_zid_lines']),
-            'extension_nesting_level': config.getint('Settings', 'extension_nesting_level', fallback=defaults['extension_nesting_level']),
-            'add_extension_to_slug': config.getboolean('Settings', 'add_extension_to_slug', fallback=False), # Default False
+            'preserve_extension_depth': config.getint('Settings', 'preserve_extension_depth', fallback=defaults['preserve_extension_depth']),
+            'slugify_extension_depth': config.getint('Settings', 'slugify_extension_depth', fallback=defaults['slugify_extension_depth']),
             'allowed_chars_regex': config.get('Settings', 'allowed_chars_regex', fallback=defaults['allowed_chars_regex']),
             'lowercase': config.getboolean('Format', 'lowercase', fallback=defaults['lowercase']),
             'separator': config.get('Format', 'separator', fallback=defaults['separator']),
@@ -65,26 +66,22 @@ def sanitizeName(inputString, cfg):
     """
     # 0. Handle Extensions
     extension_suffix = ""
-    nesting_level = cfg.get('extension_nesting_level', 0)
-    add_extension_to_slug = cfg.get('add_extension_to_slug', False)
+    preserve_depth = cfg.get('preserve_extension_depth', 0)
+    slugify_depth = cfg.get('slugify_extension_depth', 0)
     
     parts = inputString.split('.')
     effective_level = 0
     
-    if nesting_level > 0:
+    if preserve_depth > 0:
         # Calculate effective nesting level: use the configured level, 
         # but ensure we leave at least one part for the stem (len(parts)-1).
         # This allows "level=2" to work on "file.png" (treating it as level 1)
         # while correctly handling "archive.tar.gz" as level 2.
-        effective_level = min(nesting_level, len(parts) - 1)
+        effective_level = min(preserve_depth, len(parts) - 1)
     
-    elif add_extension_to_slug:
+    elif slugify_depth > 0:
         # User wants to force extension inclusion in the slug (hyphenated).
-        # We assume 1 level of extension for this mode unless otherwise specified,
-        # but sticking to 1 is safest for "file.pdf" -> "file-pdf".
-        # We treat it as effective level 1, but we will handle the suffix differently below.
-        if len(parts) > 1:
-            effective_level = 1
+        effective_level = min(slugify_depth, len(parts) - 1)
 
     if effective_level > 0:
         potential_extensions = parts[-effective_level:]
@@ -103,11 +100,11 @@ def sanitizeName(inputString, cfg):
             inputString = ".".join(stem)
             
             # Form the suffix
-            if nesting_level > 0:
+            if preserve_depth > 0:
                 # Standard extension preservation: .ext
                 extension_suffix = "." + ".".join(extensions)
-            elif add_extension_to_slug:
-                # Hypothetical slug mode: -ext
+            elif slugify_depth > 0:
+                # Slug mode: -ext
                 # We want it to join with the separator later, OR we can append it here.
                 # If we append it here as ".ext", step 1 replacements will likely turn '.' into '-'
                 # UNLESS replacements happen before re-attach? 

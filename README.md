@@ -1,6 +1,6 @@
 # ZID Name Utility
 
-[![Version](https://img.shields.io/badge/version-v1.2.8-blue)](https://github.com/voothi/20240929203511-zid-name)
+[![Version](https://img.shields.io/badge/version-v1.3.2-blue)](https://github.com/voothi/20240929203511-zid-name)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 A lightweight utility for generating clean, lowercased, and hyphen-separated slugs from text. Specifically designed for creating Zettelkasten ID (ZID) note titles and filenames.
@@ -36,7 +36,7 @@ A lightweight utility for generating clean, lowercased, and hyphen-separated slu
 - **Umlaut Handling**: Replaces `ä`, `ö`, `ü`, and `ß` with `ae`, `oe`, `ue`, and `ss`.
 - **Character Normalization**: Replaces dots, underscores, and special punctuation with hyphens.
 - **Double Separator Cleanup**: Automatically collapses multiple separators (e.g., `--` -> `-`) for cleaner output.
-- **Extension Preservation**: Configurable extension handling (`extension_nesting_level`) to preserve file types like `.mp4` or `.tar.gz`.
+- **Extension Preservation**: Configurable extension handling (`preserve_extension_depth`) to preserve file types like `.mp4` or `.tar.gz`.
 - **Clipboard Integration**: Seamlessly reads from and writes back to the system clipboard.
 
 [Return to Top](#zid-name-utility)
@@ -66,8 +66,10 @@ You can customize the script's behavior by modifying the `config.ini` file in th
 [Settings]
 slug_word_count = 4
 process_non_zid_lines = false
-extension_nesting_level = 0
-add_extension_to_slug = true
+# Preserves original extensions: e.g. 1 -> .pdf, 3 -> .1.de.srt. Takes priority over slugify.
+preserve_extension_depth = 0
+# Slugifies extensions: e.g. 1 -> -pdf, 3 -> -1-de-srt
+slugify_extension_depth = 0
 allowed_chars_regex = [^a-zA-Zа-яА-ЯёЁ0-9\s-]
 
 [Format]
@@ -87,8 +89,8 @@ _ = -
 ### Settings
 - **slug_word_count**: The maximum number of words to include in the generated slug (default: 4). This count excludes the 14-digit ZID and any preserved extensions (if configured).
 - **process_non_zid_lines**: If `true`, lines without ZIDs in a batch will still be slugified. If `false` (default), only ZID lines are processed, preserving comments and headings.
-- **extension_nesting_level**: Number of extension parts to preserve as-is (e.g. `.pdf`). Set to `0` to treat extensions as part of the text (subject to word count cutting).
-- **add_extension_to_slug**: If `true` (and `extension_nesting_level = 0`), the detected file extension is preserved but slugified (e.g. `-pdf`) and appended *after* the word count limit. Useful for ensuring extensions appear in the name even if the title is long.
+- **preserve_extension_depth**: Number of extension parts to preserve verbatim (e.g. `1` for `.pdf`, `2` for `.tar.gz`). Set to `0` to disable preservation. Takes priority over `slugify_extension_depth`.
+- **slugify_extension_depth**: Number of extension parts to preserve but convert to slug format (e.g. `1` turns `.pdf` into `-pdf`). Appended after the word count limit. Used only if `preserve_extension_depth` is 0.
 - **allowed_chars_regex**: A regular expression defining which characters are kept before splitting into words.
 
 ### Format

@@ -19,8 +19,8 @@ class TestExtensions(unittest.TestCase):
         base_config = {
             'slug_word_count': 10,
             'process_non_zid_lines': False,
-            'extension_nesting_level': 0,
-            'add_extension_to_slug': False,
+            'preserve_extension_depth': 0,
+            'slugify_extension_depth': 0,
             'allowed_chars_regex': r'[^a-zA-Zа-яА-ЯёЁ0-9\s-]',
             'lowercase': True,
             'separator': '-',
@@ -34,25 +34,25 @@ class TestExtensions(unittest.TestCase):
         
         # Level 0 (Default)
         config_0 = base_config.copy()
-        config_0['extension_nesting_level'] = 0
+        config_0['preserve_extension_depth'] = 0
         mock_get_config.return_value = config_0
         self.assertEqual(process_string(input_str), "file-name-1-ru-mp4")
         
         # Level 1
         config_1 = base_config.copy()
-        config_1['extension_nesting_level'] = 1
+        config_1['preserve_extension_depth'] = 1
         mock_get_config.return_value = config_1
         self.assertEqual(process_string(input_str), "file-name-1-ru.mp4")
         
         # Level 2
         config_2 = base_config.copy()
-        config_2['extension_nesting_level'] = 2
+        config_2['preserve_extension_depth'] = 2
         mock_get_config.return_value = config_2
         self.assertEqual(process_string(input_str), "file-name-1.ru.mp4")
         
         # Level 4 (Oversized fallback)
         config_4 = base_config.copy()
-        config_4['extension_nesting_level'] = 4
+        config_4['preserve_extension_depth'] = 4
         mock_get_config.return_value = config_4
         self.assertEqual(process_string(input_str), "file-name.1.ru.mp4")
 
@@ -62,8 +62,8 @@ class TestExtensions(unittest.TestCase):
         base_config = {
             'slug_word_count': 10,
             'process_non_zid_lines': False,
-            'extension_nesting_level': 2,
-            'add_extension_to_slug': False,
+            'preserve_extension_depth': 2,
+            'slugify_extension_depth': 0,
             'allowed_chars_regex': r'[^a-zA-Zа-яА-ЯёЁ0-9\s-]',
             'lowercase': True,
             'separator': '-',
@@ -90,8 +90,8 @@ class TestExtensions(unittest.TestCase):
         base_config = {
             'slug_word_count': 4,
             'process_non_zid_lines': False,
-            'extension_nesting_level': 0, 
-            'add_extension_to_slug': True,
+            'preserve_extension_depth': 0, 
+            'slugify_extension_depth': 1,
             'allowed_chars_regex': r'[^a-zA-Zа-яА-ЯёЁ0-9\s-]',
             'lowercase': True,
             'separator': '-',
