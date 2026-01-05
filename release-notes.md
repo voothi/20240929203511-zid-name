@@ -1,4 +1,11 @@
 
+## v1.2.8 (2026-01-05)
+**Slug Extension Control & Test Refactoring**
+
+- **Feature**: **Slug Extension Appending**. Added `add_extension_to_slug` option to `config.ini`. When enabled, file extensions are preserved and attached to the end of the slug (hyphenated) even if the filename is truncated by the word count limit (e.g., `...long-title-pdf`).
+- **Improvement**: **Test Suite Organization**. completely refactored the monolithic `test_zid_name.py` into modular files (`test_basics.py`, `test_zid_logic.py`, `test_extensions.py`) for better maintainability and discovery.
+- **Config**: Added `add_extension_to_slug` (default `false` or `true` depending on user preference, default in template is `false`).
+
 ## v1.2.4 (2026-01-05)
 **Extension Handling & Robustness**
 

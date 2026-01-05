@@ -1,6 +1,6 @@
 # ZID Name Utility
 
-[![Version](https://img.shields.io/badge/version-v1.2.4-blue)](https://github.com/voothi/20240929203511-zid-name)
+[![Version](https://img.shields.io/badge/version-v1.2.8-blue)](https://github.com/voothi/20240929203511-zid-name)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 A lightweight utility for generating clean, lowercased, and hyphen-separated slugs from text. Specifically designed for creating Zettelkasten ID (ZID) note titles and filenames.
@@ -136,7 +136,8 @@ A Python test suite is available in the `tests/` directory to verify the logic f
 
 To run the tests:
 ```bash
-python tests/test_zid_name.py
+```bash
+python -m unittest discover tests
 ```
 *Note: The tests rely on the current settings in `config.ini`. Ensure `slug_word_count` is set to 4 for the default test cases to pass.*
 
