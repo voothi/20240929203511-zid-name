@@ -173,6 +173,63 @@ simple-title
         expected = "my-header"
         self.assertEqual(process_string(input_str), expected)
 
+    @patch('zid_name.get_config')
+    def test_extension_nesting(self, mock_get_config):
+        # Base config settings
+        base_config = {
+            'slug_word_count': 10, # Large count to keep all words for this test
+            'process_non_zid_lines': False,
+            'allowed_chars_regex': r'[^a-zA-Zа-яА-ЯёЁ0-9\s-]',
+            'lowercase': True,
+            'separator': '-',
+            'replacements': {
+                 'ä': 'ae', 'ö': 'oe', 'ü': 'ue', 'ß': 'ss', 'ẞ': 'ss',
+                 'Ä': 'ae', 'Ö': 'oe', 'Ü': 'ue', '_': '-', ':': '-', '.': '-'
+            }
+        }
+        
+        input_str = "file Name.1.ru.mp4"
+        
+        # Level 0 (Default config) - should be file-name-1-ru-mp4
+        config_0 = base_config.copy()
+        config_0['extension_nesting_level'] = 0
+        mock_get_config.return_value = config_0
+        self.assertEqual(process_string(input_str), "file-name-1-ru-mp4")
+        
+        # Level 1 - should be file-name-1-ru.mp4
+        config_1 = base_config.copy()
+        config_1['extension_nesting_level'] = 1
+        mock_get_config.return_value = config_1
+        self.assertEqual(process_string(input_str), "file-name-1-ru.mp4")
+        
+        # Level 2 - should be file-name-1.ru.mp4
+        config_2 = base_config.copy()
+        config_2['extension_nesting_level'] = 2
+        mock_get_config.return_value = config_2
+        self.assertEqual(process_string(input_str), "file-name-1.ru.mp4")
+        
+        # Level 3 - should be file-name.1.ru.mp4
+        config_3 = base_config.copy()
+        config_3['extension_nesting_level'] = 3
+        mock_get_config.return_value = config_3
+        self.assertEqual(process_string(input_str), "file-name.1.ru.mp4")
+        
+        # Level 10 (High level) - should be just extension parts if too many?
+        # Actually logic says: if len(parts) > level.
+        # "file Name.1.ru.mp4" has parts ["file Name", "1", "ru", "mp4"] -> len 4.
+        # If Level 3: stem=["file Name"], ext=[".1", ".ru", ".mp4"]. Correct.
+        # If Level 4: stem=[], len(parts) is not > level. fallback to default 0 behavior (all replaced)?
+        # Our logic: if nesting_level > 0: ... if len(parts) > nesting_level: ...
+        # If NOT len > nesting_level: do nothing special (extension_suffix="").
+        # So "file Name.1.ru.mp4" (parts=4). Level 4. Condition 4 > 4 False.
+        # So treated as whole string -> "file-name-1-ru-mp4".
+        
+        config_4 = base_config.copy()
+        config_4['extension_nesting_level'] = 4
+        mock_get_config.return_value = config_4
+        self.assertEqual(process_string(input_str), "file-name-1-ru-mp4")
+
+
 if __name__ == '__main__':
     print("Running zid_name logic tests...")
     unittest.main()

@@ -13,6 +13,7 @@ def get_config():
     defaults = {
         'slug_word_count': 4,
         'process_non_zid_lines': False,
+        'extension_nesting_level': 0,
         'allowed_chars_regex': r'[^a-zA-Zа-яА-ЯёЁ0-9\s-]',
         'lowercase': True,
         'separator': '-',
@@ -31,6 +32,7 @@ def get_config():
         settings = {
             'slug_word_count': config.getint('Settings', 'slug_word_count', fallback=defaults['slug_word_count']),
             'process_non_zid_lines': config.getboolean('Settings', 'process_non_zid_lines', fallback=defaults['process_non_zid_lines']),
+            'extension_nesting_level': config.getint('Settings', 'extension_nesting_level', fallback=defaults['extension_nesting_level']),
             'allowed_chars_regex': config.get('Settings', 'allowed_chars_regex', fallback=defaults['allowed_chars_regex']),
             'lowercase': config.getboolean('Format', 'lowercase', fallback=defaults['lowercase']),
             'separator': config.get('Format', 'separator', fallback=defaults['separator']),
@@ -59,6 +61,22 @@ def sanitizeName(inputString, cfg):
     joins them with separator, and converts to lowercase.
     This function corresponds to sanitizeName in Obsidian templates.
     """
+    # 0. Handle Extensions
+    extension_suffix = ""
+    nesting_level = cfg.get('extension_nesting_level', 0)
+    
+    if nesting_level > 0:
+        parts = inputString.split('.')
+        if len(parts) > nesting_level:
+            extensions = parts[-nesting_level:]
+            stem = parts[:-nesting_level]
+            
+            # Reassemble stem so Step 1 can process it (e.g. replace dots with dashes)
+            inputString = ".".join(stem)
+            
+            # Reassemble extension suffix
+            extension_suffix = "." + ".".join(extensions)
+
     # 1. Character replacements
     processedString = inputString
     for char, replacement in cfg['replacements'].items():
@@ -77,11 +95,12 @@ def sanitizeName(inputString, cfg):
     # 5. Remove trailing separators (new requirement)
     finalName = finalName.rstrip(cfg['separator'])
 
-    # 6. Case conversion (must be last)
+    # 6. Case conversion
     if cfg['lowercase']:
         finalName = finalName.lower()
+        extension_suffix = extension_suffix.lower()
 
-    return finalName
+    return finalName + extension_suffix
 
 def process_line(line, cfg, force_sanitize=False):
     """
