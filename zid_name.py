@@ -46,7 +46,8 @@ def get_config():
             settings['replacements'] = defaults['replacements']
             
         return settings
-    except (configparser.Error, ValueError):
+    except (configparser.Error, ValueError) as e:
+        print(f"Warning: Error reading config.ini, using defaults. Error: {e}")
         return defaults
 
 def get_clipboard_text():
@@ -75,14 +76,23 @@ def sanitizeName(inputString, cfg):
         effective_level = min(nesting_level, len(parts) - 1)
         
         if effective_level > 0:
-            extensions = parts[-effective_level:]
-            stem = parts[:-effective_level]
+            potential_extensions = parts[-effective_level:]
             
-            # Reassemble stem so Step 1 can process it (e.g. replace dots with dashes)
-            inputString = ".".join(stem)
+            # Constraint: Extensions typically do not contain spaces and are not empty.
+            # If any potential extension part contains whitespace or is empty, we assume 
+            # this dot usage is NOT for a file extension (e.g. "Sentence end. Start new" or "Ending.").
+            # In that case, we abort extension handling and treat it as regular text.
+            is_valid_extension = all(ext and not re.search(r'\s', ext) for ext in potential_extensions)
             
-            # Reassemble extension suffix
-            extension_suffix = "." + ".".join(extensions)
+            if is_valid_extension:
+                extensions = potential_extensions
+                stem = parts[:-effective_level]
+                
+                # Reassemble stem so Step 1 can process it
+                inputString = ".".join(stem)
+                
+                # Reassemble extension suffix
+                extension_suffix = "." + ".".join(extensions)
 
     # 1. Character replacements
     processedString = inputString
@@ -98,6 +108,12 @@ def sanitizeName(inputString, cfg):
 
     # 4. Joining with separator
     finalName = cfg['separator'].join(firstWords)
+    
+    # 4.5. Collapse multiple separators (clean up "--" to "-")
+    # This handles cases like "foo. bar" -> "foo- bar" -> "foo--bar" -> "foo-bar"
+    # treating ". " effectively as "-" without needing specific config for it.
+    if cfg['separator']:
+        finalName = re.sub(re.escape(cfg['separator']) + '+', cfg['separator'], finalName)
 
     # 5. Remove trailing separators (new requirement)
     finalName = finalName.rstrip(cfg['separator'])

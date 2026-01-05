@@ -268,6 +268,35 @@ simple-title
         expected = "my-archive.tar.gz" # Stem: "My.Archive" -> "my-archive", Ext: ".tar.gz"
         self.assertEqual(process_string(input_str), expected)
 
+    def test_separator_deduplication(self):
+        # Test that double separators are collapsed
+        # Case: "foo. bar" -> with repls {'.': '-'} -> "foo- bar" -> "foo--bar" -> "foo-bar"
+        input_str = "foo. bar"
+        expected = "foo-bar"
+        # Since we use default config in unit tests (where main gets used), we need to ensure config is right.
+        # But wait, unit tests use process_string which uses get_config. 
+        # test utils normally rely on the file config OR mocked config.
+        # Let's rely on default mock if we can, or just mock it here to be safe.
+        
+        # We can reuse the pattern from other tests if we want specific config, 
+        # but let's see if we can just pass a string that generates double separator naturally via split/join.
+        # "Word One  Word Two" -> "word-one--word-two" (if split preserves empty strings? no split() consumes multiple spaces)
+        # "Word One - Word Two" -> "word-one---word-two" (dash is repl?)
+        # Let's use specific chars.
+        
+        # Config has {'.': '-'} by default.
+        # Input: "A. B" -> "A- B" -> split -> "A-", "B" -> join -> "A--B" -> collapse -> "A-B"
+        self.assertEqual(process_string("A. B"), "a-b")
+        
+        # Input: "Header - Subheader" -> "Header - Subheader" -> split -> "Header", "-", "Subheader" -> join -> "header---subheader" -> "header-subheader"
+        # Wait, allowed chars regex might strip loose dashes?
+        # Default allowed: [^a-zA-Z... -] (dash included).
+        # So "Header - Subheader".
+        # split -> ["Header", "-", "Subheader"]
+        # join with "-" -> "Header---Subheader"
+        # collapse -> "Header-Subheader"
+        self.assertEqual(process_string("Header - Subheader"), "header-subheader")
+
 if __name__ == '__main__':
     print("Running zid_name logic tests...")
     unittest.main()
