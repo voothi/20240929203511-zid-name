@@ -77,6 +77,22 @@ Just some comment
         self.assertNotIn("]]", output)
         self.assertEqual(output, "20260105120000-simple-task")
 
+    def test_user_complex_scenario(self):
+        # Specific user requested case
+        input_str = """- [ ] 20260105120000 Task One
+- [x] 20260105120001 Task Two - 
+Just some comment
+20260105122633 Just some comment
+  * 20260105120002 Indented Task"""
+        
+        expected = """- [ ] 20260105120000-task-one
+- [x] 20260105120001-task-two
+Just some comment
+20260105122633-just-some-comment
+  * 20260105120002-indented-task"""
+        
+        self.assertEqual(process_string(input_str), expected)
+
 if __name__ == '__main__':
     print("Running zid_name logic tests...")
     unittest.main()
