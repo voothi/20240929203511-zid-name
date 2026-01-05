@@ -91,8 +91,8 @@ def process_line(line, cfg, force_sanitize=False):
     # Group 1: Prefix (indentation, bullets, checkboxes)
     # Group 2: ZID (14 digits)
     # Group 3: Remaining text
-    zidLineRegex = r'^(\s*(?:(?:[-*+]|\d+\.)(?:\s+\[[ xX]\])?\s+)?)(\d{14})\s+(.*)$'
-    prefixOnlyRegex = r'^(\s*(?:(?:[-*+]|\d+\.)(?:\s+\[[ xX]\])?\s+))(.*)$'
+    zidLineRegex = r'^(\s*(?:(?:[-*+]|\d+\.)(?:\s+\[[ xX]\])?\s+|#{1,6}\s+)?)(\d{14})\s+(.*)$'
+    prefixOnlyRegex = r'^(\s*(?:(?:[-*+]|\d+\.)(?:\s+\[[ xX]\])?\s+|#{1,6}\s+))(.*)$'
     
     zid_match = re.match(zidLineRegex, line)
     
@@ -109,9 +109,6 @@ def process_line(line, cfg, force_sanitize=False):
              return sanitizeName(line, cfg) if line.strip() else line
         
         if cfg['process_non_zid_lines']:
-             # 1. Heading/Comment Preservation: Skip lines starting with '#'
-             if line.lstrip().startswith('#'):
-                 return line
              
              # 2. Smart List Prefix Preservation (even if no ZID)
              # If a line looks like a task/list item, preserve the prefix.

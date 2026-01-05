@@ -145,14 +145,20 @@ Simple Title
 - [ ] Task without ZID
   1. Numbered Task"""
         
-        # Heading should be preserved UNCHANGED
-        # Task without ZID should preserve prefix
+        # Heading with ZID should be processed
+        # Ordinary line should stay since process_non_zid_lines=True (mocked)
+        # But we previously had # This is a heading as preservation. Now it should be sanitized if True.
         expected = """20260105120000-task-one
-# This is a heading
+# this-is-a-heading
 simple-title
 - [ ] task-without-zid
   1. numbered-task"""
         
+        self.assertEqual(process_string(input_str), expected)
+
+    def test_heading_with_zid(self):
+        input_str = "## 20260105131245 Just some notes here."
+        expected = "## 20260105131245-just-some-notes-here"
         self.assertEqual(process_string(input_str), expected)
 
     def test_heading_preservation_single_line(self):
