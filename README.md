@@ -67,6 +67,7 @@ You can customize the script's behavior by modifying the `config.ini` file in th
 slug_word_count = 4
 process_non_zid_lines = false
 extension_nesting_level = 0
+add_extension_to_slug = true
 allowed_chars_regex = [^a-zA-Zа-яА-ЯёЁ0-9\s-]
 
 [Format]
@@ -80,7 +81,6 @@ separator = -
 ß = ss
 _ = -
 : = -
-.  = -
 . = -
 ```
 
@@ -135,7 +135,6 @@ This script maps the process to `Ctrl + Alt + ;`, performing the following steps
 A Python test suite is available in the `tests/` directory to verify the logic for umlaut handling, ZID-awareness, and word counting.
 
 To run the tests:
-```bash
 ```bash
 python -m unittest discover tests
 ```
