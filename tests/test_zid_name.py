@@ -215,20 +215,58 @@ simple-title
         self.assertEqual(process_string(input_str), "file-name.1.ru.mp4")
         
         # Level 10 (High level) - should be just extension parts if too many?
-        # Actually logic says: if len(parts) > level.
-        # "file Name.1.ru.mp4" has parts ["file Name", "1", "ru", "mp4"] -> len 4.
-        # If Level 3: stem=["file Name"], ext=[".1", ".ru", ".mp4"]. Correct.
-        # If Level 4: stem=[], len(parts) is not > level. fallback to default 0 behavior (all replaced)?
-        # Our logic: if nesting_level > 0: ... if len(parts) > nesting_level: ...
-        # If NOT len > nesting_level: do nothing special (extension_suffix="").
-        # So "file Name.1.ru.mp4" (parts=4). Level 4. Condition 4 > 4 False.
-        # So treated as whole string -> "file-name-1-ru-mp4".
+        # New "Up to" logic: min(level, len(parts)-1).
+        # "file Name.1.ru.mp4" (4 parts). len-1 = 3.
+        # Level 4 implies we want up to 4 extensions. We have 3.
+        # So we preserve 3.
         
         config_4 = base_config.copy()
         config_4['extension_nesting_level'] = 4
         mock_get_config.return_value = config_4
-        self.assertEqual(process_string(input_str), "file-name-1-ru-mp4")
+        self.assertEqual(process_string(input_str), "file-name.1.ru.mp4")
 
+
+    @patch('zid_name.get_config')
+    def test_extension_nesting_fallback(self, mock_get_config):
+        # Case specific to user report:
+        # File "file.avif" (single extension) BUT level set to 2.
+        # Should gracefully fallback to level 1 for this file.
+        
+        base_config = {
+            'slug_word_count': 10,
+            'process_non_zid_lines': False,
+            'extension_nesting_level': 2, # Requesting 2 levels
+            'allowed_chars_regex': r'[^a-zA-Zа-яА-ЯёЁ0-9\s-]',
+            'lowercase': True,
+            'separator': '-',
+            'replacements': {
+                 'ä': 'ae', 'ö': 'oe', 'ü': 'ue', 'ß': 'ss', 'ẞ': 'ss',
+                 'Ä': 'ae', 'Ö': 'oe', 'Ü': 'ue', '_': '-', ':': '-', '.': '-'
+            }
+        }
+        mock_get_config.return_value = base_config
+        
+        # Scenario 1: Actual ZID line from user report
+        # "20251019150118 33716113-5cdf-4b25-b357-b30900efd993.avif"
+        # Expectation: ZID preserved, stem sanitized (already clean), extension ".avif" preserved.
+        input_str = "20251019150118 33716113-5cdf-4b25-b357-b30900efd993.avif"
+        expected = "20251019150118-33716113-5cdf-4b25-b357-b30900efd993.avif"
+        self.assertEqual(process_string(input_str), expected)
+        
+        # Scenario 2: Simple file "image.png" with level 2
+        input_str = "Image.png"
+        expected = "image.png"
+        self.assertEqual(process_string(input_str), expected)
+        
+        # Scenario 3: "archive.tar.gz" with level 2 (Exact match)
+        input_str = "Archive.tar.gz"
+        expected = "archive.tar.gz"
+        self.assertEqual(process_string(input_str), expected)
+        
+        # Scenario 4: "my.archive.tar.gz" with level 2
+        input_str = "My.Archive.tar.gz"
+        expected = "my-archive.tar.gz" # Stem: "My.Archive" -> "my-archive", Ext: ".tar.gz"
+        self.assertEqual(process_string(input_str), expected)
 
 if __name__ == '__main__':
     print("Running zid_name logic tests...")

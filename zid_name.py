@@ -65,11 +65,18 @@ def sanitizeName(inputString, cfg):
     extension_suffix = ""
     nesting_level = cfg.get('extension_nesting_level', 0)
     
+    
     if nesting_level > 0:
         parts = inputString.split('.')
-        if len(parts) > nesting_level:
-            extensions = parts[-nesting_level:]
-            stem = parts[:-nesting_level]
+        # Calculate effective nesting level: use the configured level, 
+        # but ensure we leave at least one part for the stem (len(parts)-1).
+        # This allows "level=2" to work on "file.png" (treating it as level 1)
+        # while correctly handling "archive.tar.gz" as level 2.
+        effective_level = min(nesting_level, len(parts) - 1)
+        
+        if effective_level > 0:
+            extensions = parts[-effective_level:]
+            stem = parts[:-effective_level]
             
             # Reassemble stem so Step 1 can process it (e.g. replace dots with dashes)
             inputString = ".".join(stem)
