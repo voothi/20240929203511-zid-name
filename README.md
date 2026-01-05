@@ -1,6 +1,6 @@
 # ZID Name Utility
 
-[![Version](https://img.shields.io/badge/version-v1.1.0-blue)](https://github.com/voothi/20240929203511-zid-name)
+[![Version](https://img.shields.io/badge/version-v1.2.0-blue)](https://github.com/voothi/20240929203511-zid-name)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 A lightweight utility for generating clean, lowercased, and hyphen-separated slugs from text. Specifically designed for creating Zettelkasten ID (ZID) note titles and filenames.
@@ -26,14 +26,15 @@ A lightweight utility for generating clean, lowercased, and hyphen-separated slu
 [Return to Top](#zid-name-utility)
 
 ## Features
-- **Smart Slug Generation**: Converts titles into clean filenames (e.g., `My Note Title` → `my-note-title`).
-- **ZID-Awareness**: Automatically detects 14-digit timestamps (ZIDs) at the start of the input and excludes them from the word count.
+- **Batch Mode Support**: Process entire task lists or multiple titles in one go while preserving document structure.
+- **Smart Sanitization**: Automatically detects whether to sanitize substrings (always) or multi-line blocks (based on config).
+- **ZID-Awareness**: Standardized regex identifies 14-digit timestamps (ZIDs) with prefixes (bullets, checkboxes, numbers) and excludes ZIDs from word counts.
+- **Heading & Structure Preservation**: Protects Markdown headings (`#`) and list item markers in batch mode.
 - **External Configuration**: Customize the word limit, character replacements, and formatting via `config.ini`.
 - **Word Limiting**: Automatically trims the result (excluding ZID) to the configured word count (default: 4).
 - **Umlaut Handling**: Replaces `ä`, `ö`, `ü`, and `ß` with `ae`, `oe`, `ue`, and `ss`.
 - **Character Normalization**: Replaces dots, underscores, and special punctuation with hyphens.
 - **Clipboard Integration**: Seamlessly reads from and writes back to the system clipboard.
-- **Fast Execution**: Designed to be run as a quick background utility.
 
 [Return to Top](#zid-name-utility)
 
@@ -61,6 +62,7 @@ You can customize the script's behavior by modifying the `config.ini` file in th
 ```ini
 [Settings]
 slug_word_count = 4
+process_non_zid_lines = false
 allowed_chars_regex = [^a-zA-Zа-яА-ЯёЁ0-9\s-]
 
 [Format]
@@ -76,6 +78,7 @@ separator = -
 
 ### Settings
 - **slug_word_count**: The maximum number of words to include in the generated slug (default: 4). This count excludes the 14-digit ZID if present at the start of the input.
+- **process_non_zid_lines**: If `true`, lines without ZIDs in a batch will still be slugified. If `false` (default), only ZID lines are processed, preserving comments and headings.
 - **allowed_chars_regex**: A regular expression defining which characters are kept before splitting into words.
 
 ### Format

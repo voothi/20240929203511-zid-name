@@ -1,5 +1,18 @@
 
-## v1.1.0 (2026-01-04)
+## v1.2.0 (2026-01-05)
+**Batch Processing & Smart Sanitization**
+
+- **Feature**: **Batch Mode Support**. Multi-line selections can now be processed in one go. The script intelligently detects if the input contains ZID task lines.
+- **Feature**: **Smart Sanitization**. 
+    - **Single-line** inputs are always sanitized to support manual substring or title-to-filename workflows.
+    - **Multi-line** blocks respect the new `process_non_zid_lines` config flag to preserve comments and document structure.
+- **Improvement**: **Heading Preservation**. Lines starting with `#` are preserved exactly as-is in batch mode to protect document structure.
+- **Improvement**: **List Marker Preservation**. Standardized regex now recognizes and preserves indentation, bullets, checkboxes (`- [ ]`, `- [x]`), and numbering.
+- **Improvement**: **Sanitization Refinement**. Added automatic stripping of trailing separators (e.g., `-`) from the generated slugs.
+- **Config**: Added `process_non_zid_lines` (default `false`) to control whether lines without ZIDs should be slugified in batch mode.
+- **Testing**: Unified and expanded test suite with coverage for mixed content, complex prefixes, and configuration permutations.
+
+
 **Enhanced Configurability & Obsidian Integration**
 
 - **Feature**: **External Configuration (`config.ini`)**. Key settings like `slug_word_count`, `separator`, and `replacements` are now externalized.
