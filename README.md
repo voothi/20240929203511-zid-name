@@ -28,8 +28,8 @@ A lightweight utility for generating clean, lowercased, and hyphen-separated slu
 ## Features
 - **Batch Mode Support**: Process entire task lists or multiple titles in one go while preserving document structure.
 - **Smart Sanitization**: Automatically detects whether to sanitize substrings (always) or multi-line blocks (based on config).
-- **ZID-Awareness**: Standardized regex identifies 14-digit timestamps (ZIDs) with prefixes (bullets, checkboxes, numbers) and excludes ZIDs from word counts.
-- **Heading & Structure Preservation**: Protects Markdown headings (`#`) and list item markers in batch mode.
+- **ZID-Awareness**: Standardized regex identifies 14-digit timestamps (ZIDs) with prefixes (bullets, checkboxes, numbers, and headings) and excludes ZIDs from word counts.
+- **Markdown Heading Support**: Correctly handles `#` to `######` headers as structural prefixes.
 - **External Configuration**: Customize the word limit, character replacements, and formatting via `config.ini`.
 - **Word Limiting**: Automatically trims the result (excluding ZID) to the configured word count (default: 4).
 - **Umlaut Handling**: Replaces `ä`, `ö`, `ü`, and `ß` with `ae`, `oe`, `ue`, and `ss`.
