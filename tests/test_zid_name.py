@@ -1,4 +1,5 @@
 import unittest
+from unittest.mock import patch
 import sys
 import os
 
@@ -91,6 +92,62 @@ Just some comment
 20260105122633-just-some-comment
   * 20260105120002-indented-task"""
         
+        self.assertEqual(process_string(input_str), expected)
+
+    @patch('zid_name.get_config')
+    def test_process_non_zid_lines_false(self, mock_get_config):
+        # MOCK config: process_non_zid_lines = False
+        mock_get_config.return_value = {
+            'slug_word_count': 4,
+            'process_non_zid_lines': False,
+            'allowed_chars_regex': r'[^a-zA-Zа-яА-ЯёЁ0-9\s-]',
+            'lowercase': True,
+            'separator': '-',
+            'replacements': {
+                 'ä': 'ae', 'ö': 'oe', 'ü': 'ue', 'ß': 'ss', 'ẞ': 'ss',
+                 'Ä': 'ae', 'Ö': 'oe', 'Ü': 'ue', '_': '-', ':': '-', '.': '-'
+            }
+        }
+        
+        # Test input with NO ZID
+        input_str = "Simple Title"
+        # Should return UNCHANGED because process_non_zid_lines is False
+        expected = "Simple Title"
+        self.assertEqual(process_string(input_str), expected)
+        
+        # Mixed content
+        input_str = """20260105120000 Task One
+Simple Title"""
+        expected = """20260105120000-task-one
+Simple Title"""
+        self.assertEqual(process_string(input_str), expected)
+
+    @patch('zid_name.get_config')
+    def test_process_non_zid_lines_true(self, mock_get_config):
+        # MOCK config: process_non_zid_lines = True
+        mock_get_config.return_value = {
+            'slug_word_count': 4,
+            'process_non_zid_lines': True, # ENABLED
+            'allowed_chars_regex': r'[^a-zA-Zа-яА-ЯёЁ0-9\s-]',
+            'lowercase': True,
+            'separator': '-',
+            'replacements': {
+                 'ä': 'ae', 'ö': 'oe', 'ü': 'ue', 'ß': 'ss', 'ẞ': 'ss',
+                 'Ä': 'ae', 'Ö': 'oe', 'Ü': 'ue', '_': '-', ':': '-', '.': '-'
+            }
+        }
+        
+        # Test input with NO ZID
+        input_str = "Simple Title"
+        # Should be processed
+        expected = "simple-title"
+        self.assertEqual(process_string(input_str), expected)
+        
+        # Mixed content
+        input_str = """20260105120000 Task One
+Simple Title"""
+        expected = """20260105120000-task-one
+simple-title"""
         self.assertEqual(process_string(input_str), expected)
 
 if __name__ == '__main__':

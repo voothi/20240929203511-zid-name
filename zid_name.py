@@ -12,6 +12,7 @@ def get_config():
     
     defaults = {
         'slug_word_count': 4,
+        'process_non_zid_lines': False,
         'allowed_chars_regex': r'[^a-zA-Zа-яА-ЯёЁ0-9\s-]',
         'lowercase': True,
         'separator': '-',
@@ -29,6 +30,7 @@ def get_config():
         
         settings = {
             'slug_word_count': config.getint('Settings', 'slug_word_count', fallback=defaults['slug_word_count']),
+            'process_non_zid_lines': config.getboolean('Settings', 'process_non_zid_lines', fallback=defaults['process_non_zid_lines']),
             'allowed_chars_regex': config.get('Settings', 'allowed_chars_regex', fallback=defaults['allowed_chars_regex']),
             'lowercase': config.getboolean('Format', 'lowercase', fallback=defaults['lowercase']),
             'separator': config.get('Format', 'separator', fallback=defaults['separator']),
@@ -99,18 +101,15 @@ def process_line(line, cfg):
         safe_name = sanitizeName(raw_text, cfg)
         return f"{prefix}{zid}{cfg['separator']}{safe_name}"
     else:
-        # If no ZID found, check if it's just a text line we might want to sanitize?
-        # The requirement says: "If it doesn't match, return the line exactly as it was"
-        # BUT the original code (lines 98-99) called sanitizeName on the whole string if no ZID was found.
-        # This behavior for SINGLE line input might be desired, but for BATCH mode (multi-line),
-        # preserving non-matching lines is safer for mixed content.
-        # However, for backward compatibility with single-line usage where someone just pastes "My Title",
-        # we might want to keep that.
-        # Let's check if the whole input was multi-line or not in process_string.
-        # For this helper, let's assume if it's not a ZID line, we return it as is if it's part of a batch?
-        # Or does the user want "My Title" -> "my-title"?
-        # User request: "If it doesn't match, return the line exactly as it was (preserving comments or empty lines)."
-        return line
+        # Check config to see if we should process non-ZID lines
+        if cfg['process_non_zid_lines']:
+             # Only sanitize if not empty? 
+             if line.strip():
+                return sanitizeName(line, cfg)
+             else:
+                return line
+        else:
+            return line
 
 def process_string(input_string):
     """
@@ -119,45 +118,10 @@ def process_string(input_string):
     cfg = get_config()
     lines = input_string.splitlines()
     
-    # Heuristic: Check if ANY line matches the ZID pattern to trigger strict "Batch Mode".
-    # If NO lines match ZID regex, we might fall back to "Single Title Mode" to preserve
-    # the behavior of pasting "My Cool Title" -> "my-cool-title".
-    
-    zidLineRegex = r'^(\s*(?:(?:[-*+]|\d+\.)(?:\s+\[[ xX]\])?\s+)?)(\d{14})\s+(.*)$'
-    has_zid = any(re.match(zidLineRegex, line) for line in lines)
-    
     processed_lines = []
     
-    if has_zid:
-        for line in lines:
-            processed_lines.append(process_line(line, cfg))
-    else:
-        # No ZIDs found in the entire block.
-        # If it's a single line, we definitely want to sanitize it (legacy behavior).
-        # If it's multiple lines, do we sanitize each line? Or treated as one block?
-        # The prompt says: "If you select 5 task lines, it tries to create one giant slug."
-        # indicating the previous behavior was bad for multiple lines.
-        # Let's treat it line-by-line using sanitizeName if it's not empty.
-        # But wait, User said: "If it doesn't match, return the line exactly as it was".
-        # That applies to "Batch Mode" where "Mode Detection: Check if ANY of those lines match...".
-        # So if NO lines match, do we assume it's NOT batch mode?
-        # If I paste "My Title", I expect "my-title".
-        # If I paste "Line 1\nLine 2", I probably expect "line-1\nline-2" or unchanged?
-        # Let's stick to the explicit instruction: "Mode Detection: Check if *any* of those lines match the ZID format. If yes, enter batch mode."
-        
-        if len(lines) == 1:
-             # Basic single line sanitization (legacy)
-             return sanitizeName(lines[0], cfg)
-        else:
-            # Multi-line, NO ZIDs.
-            # Behavior undefined in prompt, but "treats the entire clipboard as one single block" was the complaint.
-            # Safe bet: Sanitize each line individually? Or literal return?
-            # Let's sanitize each line individually as a useful default for "list of titles".
-            for line in lines:
-                if line.strip():
-                     processed_lines.append(sanitizeName(line, cfg))
-                else:
-                     processed_lines.append(line)
+    for line in lines:
+        processed_lines.append(process_line(line, cfg))
                      
     return "\n".join(processed_lines)
 
